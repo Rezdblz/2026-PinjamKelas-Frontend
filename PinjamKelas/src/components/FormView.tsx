@@ -1,10 +1,13 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from 'react';
+import Flatpickr from 'react-flatpickr';
+import 'flatpickr/dist/flatpickr.min.css';
+
 interface FormData {
     title: string;
     id_classroom: string;
     description: string;
-    start_time: string;
-    end_time: string;
+    start_time: Date | null;
+    end_time: Date | null;
 }
 interface Classroom {
     id: number
@@ -16,8 +19,8 @@ function FormView() {
         title: '',
         id_classroom: '',
         description: '',
-        start_time: '',
-        end_time: ''
+        start_time: null,
+        end_time: null,
     })
     const [classroom, setClassrooms] = useState<Classroom[]>([]);
     const [loading, setLoading] = useState(true);
@@ -53,18 +56,25 @@ function FormView() {
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
+        e.preventDefault()
+
+        if (!formData.start_time || !formData.end_time) {
+            alert('Waktu mulai dan selesai wajib diisi.')
+            return
+        }
+
         const postData = {
             title: formData.title,
-            id_users: 1,//get from user data if possible
-            id_classroom: parseInt(formData.id_classroom),
+            id_users: 1, // TODO: from session
+            id_classroom: parseInt(formData.id_classroom, 10),
             description: formData.description,
             status: 'pending',
-            start_time: new Date(formData.start_time).toISOString(),
-            end_time: new Date(formData.end_time).toISOString()
+            start_time: formData.start_time.toISOString(),
+            expiry: formData.end_time.toISOString(),
         }
-        console.log('sending form data to backend', postData)
-        //api call here
+
+        console.log('Submitting to backend:', postData)
+        // TODO: API call
     }
     return (
         <div className="">
@@ -85,7 +95,7 @@ function FormView() {
                         required
                     />
                 </div>
-                {/* Classroom Selection - Dynamic from Database */}
+                {/* Classroom Selection */}
                 <div>
                     <label htmlFor="id_classroom" className="block text-sm font-medium text-gray-700 mb-2">
                         Pilih Kelas <span className="text-red-500">*</span>
@@ -119,32 +129,26 @@ function FormView() {
                 </div>
                 {/* Start Time */}
                 <div>
-                    <label htmlFor="start_time" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
                         Waktu Mulai <span className="text-red-500">*</span>
                     </label>
-                    <input
-                        type="datetime-local"
-                        id="start_time"
-                        name="start_time"
-                        value={formData.start_time}
-                        onChange={handleChange}
+                    <Flatpickr
+                        value={formData.start_time ?? undefined}
+                        options={{ enableTime: true, dateFormat: 'Y-m-d H:i' }}
+                        onChange={([date]) => setFormData({ ...formData, start_time: date ?? null })}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        required
                     />
                 </div>
                 {/* End Time */}
                 <div>
-                    <label htmlFor="end_time" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
                         Waktu Selesai <span className="text-red-500">*</span>
                     </label>
-                    <input
-                        type="datetime-local"
-                        id="end_time"
-                        name="end_time"
-                        value={formData.end_time}
-                        onChange={handleChange}
+                    <Flatpickr
+                        value={formData.end_time ?? undefined}
+                        options={{ enableTime: true, dateFormat: 'Y-m-d H:i' }}
+                        onChange={([date]) => setFormData({ ...formData, end_time: date ?? null })}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        required
                     />
                 </div>
                 {/* Description */}

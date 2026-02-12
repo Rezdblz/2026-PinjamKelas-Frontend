@@ -1,18 +1,16 @@
 import { useState } from 'react'
 import './App.css'
-import ViewToggle from'./components/slider'
+import ViewToggle from './components/slider'
+import FormView from './components/FormView'
+
 function App() {
-  const [activeView,setActiveView] = useState<'table'|'form'>('form')
+  const [activeView, setActiveView] = useState<'table'|'form'>('form')
 
   return (
-    <>
-      <div className='min-h-screen'>
-        <div className='bg-blue-950'>
-          <ViewToggle activeView ={activeView} onToggle={setActiveView}/>
-        </div>
-        <div></div>
-      </div>
-    </>
+    <div className="min-h-screen bg-amber-600">
+      <ViewToggle activeView={activeView} onToggle={setActiveView} />
+      {activeView === 'form' && <FormView />}
+    </div>
   )
 }
 
