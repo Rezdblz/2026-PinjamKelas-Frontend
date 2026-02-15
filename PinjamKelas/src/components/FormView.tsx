@@ -11,8 +11,8 @@ interface FormData {
 }
 interface Classroom {
     id: number
-    class_name: string
-    status: string
+    className: string
+    status: number
 }
 function FormView() {
     const [formData, setFormData] = useState<FormData>({
@@ -29,10 +29,12 @@ function FormView() {
         const fetchClassrooms = async () => {
             try {
                 setLoading(true);
-                //add api call or endpoint here for classroom data
-                const response = await fetch('')
+                const apiUrl = import.meta.env.VITE_API_URL;
+                console.log('Fetching from:', `${apiUrl}/Classrooms`);
+                const response = await fetch(`${apiUrl}/Classrooms`)
                 if (!response.ok) {
-                    throw new Error('Failed to fetch Classroom')
+                    const errorText = await response.text();
+                    throw new Error(`HTTP ${response.status}: ${errorText || response.statusText}`)
                 }
                 const data = await response.json();
                 setClassrooms(data);
@@ -70,18 +72,18 @@ function FormView() {
             description: formData.description,
             status: 'pending',
             start_time: formData.start_time.toISOString(),
-            expiry: formData.end_time.toISOString(),
+            End_time: formData.end_time.toISOString(),
         }
 
         console.log('Submitting to backend:', postData)
         // TODO: API call
     }
     return (
-        <div className="">
-            <form onSubmit={handleSubmit} className="">
+        <div className="min-h-screen w-full bg-slate-50 py-8 px-4">
+            <form onSubmit={handleSubmit} className="max-w-2xl mx-auto bg-white rounded-lg shadow-md p-8 space-y-6">
                 {/* title */}
                 <div>
-                    <label htmlFor="title" className="">
+                    <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
                         Judul Peminjaman
                     </label>
                     <input
@@ -90,7 +92,7 @@ function FormView() {
                         name="title"
                         value={formData.title}
                         onChange={handleChange}
-                        className=""
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="rapat,kelas,......."
                         required
                     />
@@ -113,10 +115,10 @@ function FormView() {
                             {loading ? 'Loading...' : '-- Pilih Kelas --'}
                         </option>
                         {classroom
-                            .filter(classroom => classroom.status === 'available') // Only show available classrooms
+                            .filter(classroom => classroom.status === 0) // Status 0 = available
                             .map((classroom) => (
                                 <option key={classroom.id} value={classroom.id}>
-                                    {classroom.class_name}
+                                    {classroom.className}
                                 </option>
                             ))}
                     </select>
