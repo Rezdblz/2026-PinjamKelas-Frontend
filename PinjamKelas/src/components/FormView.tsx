@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import Flatpickr from 'react-flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
+import { API_URL, fetchWithAuth } from '../config/api';
+import { useAuth } from '../hooks/useAuth';
 
 interface FormData {
     title: string;
@@ -15,6 +17,7 @@ interface Classroom {
     status: number
 }
 function FormView() {
+    const { user } = useAuth();
     const [formData, setFormData] = useState<FormData>({
         title: '',
         id_classroom: '',
@@ -25,13 +28,13 @@ function FormView() {
     const [classroom, setClassrooms] = useState<Classroom[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [submitting, setSubmitting] = useState(false);
     useEffect(() => {
         const fetchClassrooms = async () => {
             try {
                 setLoading(true);
-                const apiUrl = import.meta.env.VITE_API_URL;
-                console.log('Fetching from:', `${apiUrl}/Classrooms`);
-                const response = await fetch(`${apiUrl}/Classrooms`)
+                console.log('Fetching from:', `${API_URL}/Classrooms`);
+                const response = await fetchWithAuth(`${API_URL}/Classrooms`)
                 if (!response.ok) {
                     const errorText = await response.text();
                     throw new Error(`HTTP ${response.status}: ${errorText || response.statusText}`)
@@ -60,6 +63,11 @@ function FormView() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
+        if (!user?.id) {
+            alert('User not authenticated')
+            return
+        }
+
         if (!formData.start_time || !formData.end_time) {
             alert('Waktu mulai dan selesai wajib diisi.')
             return
@@ -67,16 +75,41 @@ function FormView() {
 
         const postData = {
             title: formData.title,
-            id_users: 1, // TODO: from session
-            id_classroom: parseInt(formData.id_classroom, 10),
+            idUsers: user.id,
+            idClassroom: parseInt(formData.id_classroom, 10),
             description: formData.description,
-            status: 'pending',
-            start_time: formData.start_time.toISOString(),
-            End_time: formData.end_time.toISOString(),
+            status: 0,
+            startTime: formData.start_time.toISOString(),
+            endTime: formData.end_time.toISOString(),
         }
 
-        console.log('Submitting to backend:', postData)
-        // TODO: API call
+        try {
+            setSubmitting(true)
+            console.log('Submitting to backend:', postData)
+            const response = await fetchWithAuth(`${API_URL}/Posts`, {
+                method: 'POST',
+                body: JSON.stringify(postData),
+            })
+
+            if (!response.ok) {
+                const errorText = await response.text()
+                throw new Error(`HTTP ${response.status}: ${errorText || response.statusText}`)
+            }
+
+            setFormData({
+                title: '',
+                id_classroom: '',
+                description: '',
+                start_time: null,
+                end_time: null,
+            })
+            alert('Peminjaman berhasil diajukan!')
+        } catch (err) {
+            console.error('Error submitting form:', err)
+            alert(err instanceof Error ? err.message : 'Gagal mengajukan peminjaman')
+        } finally {
+            setSubmitting(false)
+        }
     }
     return (
         <div className="min-h-screen w-full bg-slate-50 py-8 px-4">
@@ -173,9 +206,10 @@ function FormView() {
                 <div className="pt-4">
                     <button
                         type="submit"
-                        className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg"
+                        disabled={submitting}
+                        className="w-full bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg disabled:cursor-not-allowed"
                     >
-                        Ajukan Peminjaman
+                        {submitting ? 'Mengirim...' : 'Ajukan Peminjaman'}
                     </button>
                 </div>
             </form>
