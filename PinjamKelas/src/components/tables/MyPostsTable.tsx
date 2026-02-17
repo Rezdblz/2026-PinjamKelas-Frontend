@@ -3,10 +3,14 @@ import { API_URL } from '../../config/api';
 import Detail, { type PostRecord } from '../ButtonComponents/Detail';
 import { useAuth } from '../../hooks/useAuth';
 import Update from '../ButtonComponents/Update';
+import SearchFilter from '../filter/SearchFilter';
 
 const MyPostsTable: React.FC = () => {
   const { user } = useAuth();
   const [data, setData] = useState<PostRecord[]>([]);
+  const [filteredData, setFilteredData] = useState<PostRecord[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedPost, setSelectedPost] = useState<PostRecord | null>(null);
@@ -35,6 +39,25 @@ const MyPostsTable: React.FC = () => {
 
     fetchMyPosts();
   }, [user?.id]);
+
+  useEffect(() => {
+    let filtered = data;
+
+    // Filter by search query
+    if (searchQuery.trim()) {
+      filtered = filtered.filter(post =>
+        post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        post.description.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    // Filter by status
+    if (statusFilter !== null) {
+      filtered = filtered.filter(post => post.status === statusFilter);
+    }
+
+    setFilteredData(filtered);
+  }, [data, searchQuery, statusFilter]);
 
   const getStatusBadge = (status: number) => {
     const statusStyles = {
@@ -119,6 +142,12 @@ const MyPostsTable: React.FC = () => {
 
   return (
     <>
+      <SearchFilter 
+        onSearch={setSearchQuery}
+        onStatusFilter={setStatusFilter}
+        placeholder="Search your posts..."
+      />
+      
       <div className="bg-white rounded-lg shadow overflow-x-auto">
         <table className="w-full">
           <thead>
@@ -132,7 +161,7 @@ const MyPostsTable: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {data.map((record) => (
+            {filteredData.map((record) => (
               <tr key={record.id} className="border-b hover:bg-slate-50">
                 <td className="px-6 py-3">{record.title}</td>
                 <td className="px-6 py-3">
