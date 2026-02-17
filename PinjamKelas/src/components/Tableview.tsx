@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import MyPostsTable from './tables/MyPostsTable';
 import AllPostsTable from './tables/AllPostsTable';
-import LogTable from './tables/LogTable';
+{/*import LogTable from './tables/LogTable';*/}
 import { useAuth } from '../hooks/useAuth';
 
 type TableType = 'myPosts' | 'allPosts' | 'logTable';
@@ -43,6 +43,7 @@ const TableView: React.FC = () => {
               >
                 All Posts
               </button>
+              {/* 
               <button
                 onClick={() => setActiveTable('logTable')}
                 className={`pb-2 px-2 font-medium transition-colors ${
@@ -53,6 +54,7 @@ const TableView: React.FC = () => {
               >
                 Activity Logs
               </button>
+              */}
             </>
           )}
         </div>
@@ -62,7 +64,7 @@ const TableView: React.FC = () => {
       <div className="p-8">
         {!isAdmin && activeTable === 'myPosts' && <MyPostsTable />}
         {isAdmin && activeTable === 'allPosts' && <AllPostsTable />}
-        {isAdmin && activeTable === 'logTable' && <LogTable />}
+        {/*{isAdmin && activeTable === 'logTable' && <LogTable />}*/}
       </div>
     </div>
   );
