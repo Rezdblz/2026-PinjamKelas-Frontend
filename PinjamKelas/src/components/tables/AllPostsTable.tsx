@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { API_URL, fetchWithAuth } from '../../config/api';
-import Detail, { type PostRecord } from '../Detail';
+import Detail, { type PostRecord } from '../ButtonComponents/Detail';
 
 const AllPostsTable: React.FC = () => {
   const [data, setData] = useState<PostRecord[]>([]);

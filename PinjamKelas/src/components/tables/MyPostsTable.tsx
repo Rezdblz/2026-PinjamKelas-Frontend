@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { API_URL } from '../../config/api';
-import Detail, { type PostRecord } from '../Detail';
+import Detail, { type PostRecord } from '../ButtonComponents/Detail';
 import { useAuth } from '../../hooks/useAuth';
+import Update from '../ButtonComponents/Update';
 
 const MyPostsTable: React.FC = () => {
   const { user } = useAuth();
@@ -9,6 +10,8 @@ const MyPostsTable: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedPost, setSelectedPost] = useState<PostRecord | null>(null);
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [postToUpdate, setPostToUpdate] = useState<PostRecord | null>(null);
 
   useEffect(() => {
     const fetchMyPosts = async () => {
@@ -52,7 +55,32 @@ const MyPostsTable: React.FC = () => {
   };
 
   const handleUpdate = (id: number) => {
-    console.log('Update post:', id);
+    const post = data.find(p => p.id === id);
+    if (post) {
+      setPostToUpdate(post);
+      setShowUpdateModal(true);
+    }
+  };
+
+  const handleUpdateClose = () => {
+    setShowUpdateModal(false);
+    setPostToUpdate(null);
+  };
+
+  const handleUpdateSuccess = () => {
+    // Refresh the posts list after successful update
+    const fetchMyPosts = async () => {
+      try {
+        if (!user?.id) return;
+        const response = await fetch(`${API_URL}/Posts/user/${user.id}`);
+        if (!response.ok) throw new Error('Failed to fetch posts');
+        const result = await response.json();
+        setData(result);
+      } catch (err) {
+        console.error('Error refreshing posts:', err);
+      }
+    };
+    fetchMyPosts();
   };
 
   const handleDetail = (id: number) => {
@@ -146,6 +174,14 @@ const MyPostsTable: React.FC = () => {
       </div>
       
       <Detail post={selectedPost} onClose={() => setSelectedPost(null)} />
+      
+      {showUpdateModal && (
+        <Update 
+          post={postToUpdate} 
+          onClose={handleUpdateClose} 
+          onSuccess={handleUpdateSuccess}
+        />
+      )}
     </>
   );
 };
