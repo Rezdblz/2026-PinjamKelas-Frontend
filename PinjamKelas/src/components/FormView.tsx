@@ -112,7 +112,7 @@ function FormView() {
         }
     }
     return (
-        <div className="min-h-screen w-full bg-slate-50 py-8 px-4">
+        <div className="min-h-screen w-full bg-slate-500 py-8 px-4">
             <form onSubmit={handleSubmit} className="max-w-2xl mx-auto bg-white rounded-lg shadow-md p-8 space-y-6">
                 {/* title */}
                 <div>

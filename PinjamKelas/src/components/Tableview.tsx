@@ -15,17 +15,17 @@ const TableView: React.FC = () => {
   const [activeTable, setActiveTable] = useState<TableType>(defaultView);
 
   return (
-    <div className="min-h-screen w-full bg-slate-50">
+    <div className="min-h-screen w-full bg-slate-500">
       {/* Table Toggle Navbar */}
-      <div className="bg-white border-b">
-        <div className="p-4 flex gap-6">
+      <div className="bg-slate-800 border-b border-slate-700 shadow-lg">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex gap-8">
           {!isAdmin && (
             <button
               onClick={() => setActiveTable('myPosts')}
-              className={`pb-2 px-2 font-medium transition-colors ${
+              className={`px-3 py-2 font-bold rounded-lg transition-colors text-sm ${
                 activeTable === 'myPosts'
-                  ? 'text-blue-600 border-b-2 border-blue-600'
-                  : 'text-gray-600 hover:text-gray-900'
+                  ? 'bg-white text-slate-900'
+                  : 'text-slate-400 hover:text-white'
               }`}
             >
               My Posts
@@ -35,10 +35,10 @@ const TableView: React.FC = () => {
             <>
               <button
                 onClick={() => setActiveTable('allPosts')}
-                className={`pb-2 px-2 font-medium transition-colors ${
+                className={`px-3 py-2 font-bold rounded-lg transition-colors text-sm ${
                   activeTable === 'allPosts'
-                    ? 'text-blue-600 border-b-2 border-blue-600'
-                    : 'text-gray-600 hover:text-gray-900'
+                    ? 'bg-white text-slate-900'
+                    : 'text-slate-400 hover:text-white'
                 }`}
               >
                 All Posts
@@ -46,10 +46,10 @@ const TableView: React.FC = () => {
               {/* 
               <button
                 onClick={() => setActiveTable('logTable')}
-                className={`pb-2 px-2 font-medium transition-colors ${
+                className={`pb-2 px-3 font-medium transition-colors text-sm ${
                   activeTable === 'logTable'
-                    ? 'text-blue-600 border-b-2 border-blue-600'
-                    : 'text-gray-600 hover:text-gray-900'
+                    ? 'text-blue-400 border-b-2 border-blue-400'
+                    : 'text-slate-400 hover:text-white'
                 }`}
               >
                 Activity Logs
@@ -61,7 +61,7 @@ const TableView: React.FC = () => {
       </div>
 
       {/* Table Content */}
-      <div className="p-8">
+      <div className="max-w-7xl mx-auto px-6 py-8">
         {!isAdmin && activeTable === 'myPosts' && <MyPostsTable />}
         {isAdmin && activeTable === 'allPosts' && <AllPostsTable />}
         {/*{isAdmin && activeTable === 'logTable' && <LogTable />}*/}

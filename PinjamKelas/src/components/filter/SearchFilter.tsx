@@ -63,7 +63,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
 
         <button
           onClick={handleReset}
-          className="px-6 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors font-medium"
+          className="px-6 py-2 bg-gray-700 text-gray-200 rounded-lg hover:bg-gray-600 transition-colors font-medium"
         >
           Reset
         </button>
